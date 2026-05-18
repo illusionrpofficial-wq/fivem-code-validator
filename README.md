@@ -11,6 +11,7 @@ FiveM resources often contain subtle security, manifest, and runtime issues that
 - Validates `fxmanifest.lua` presence and required metadata.
 - Resolves manifest file references, checks `ui_page`, and detects undeclared web assets.
 - Checks curated client/server/shared native side usage.
+- Can run `luacheck` and merge the findings with FiveM-specific checks.
 - Warns on suspicious native argument counts.
 - Finds infinite loops without `Wait` or `Delay`.
 - Enforces a configurable custom event prefix.
@@ -71,6 +72,7 @@ npx @sajat-org/fivem-checker . --fail-on warn
 npx @sajat-org/fivem-checker . --write-baseline
 npx @sajat-org/fivem-checker . --no-color
 npx @sajat-org/fivem-checker . --offline
+npx @sajat-org/fivem-checker . --luacheck
 ```
 
 CLI options:
@@ -85,8 +87,10 @@ CLI options:
 | `--fail-on <level>` | Fail on `info`, `warn`, `error`, or `high` |
 | `--format <text\|json>` | Select console output format |
 | `--no-color` | Disable ANSI colors in text output |
-| `--offline` | Skip remote native refresh |
-| `--no-remote-natives` | Only use the bundled native catalog |
+| `--offline` | Skip remote FiveM metadata refresh |
+| `--luacheck` | Enable luacheck integration for Lua files |
+| `--luacheck-bin <path>` | Override the luacheck binary path |
+| `--no-remote-natives` | Only use the bundled native/runtime metadata |
 | `--help` | Show help |
 
 ## GitHub Action usage
@@ -149,7 +153,13 @@ Create `.fivemcheck.json` in the resource repo:
     "web/vendor/**"
   ],
   "baseline": ".fivemcheck-baseline.json",
+  "luacheck": {
+    "enabled": true,
+    "binary": "luacheck",
+    "extraGlobals": ["ESX"]
+  },
   "rules": {
+    "luacheck": "warn",
     "native-side-check": "error",
     "native-arg-count": "warn",
     "no-loop-without-wait": "error",
@@ -171,7 +181,24 @@ Top-level config fields:
 | `manifest` | Custom manifest filename. Defaults to `fxmanifest.lua` |
 | `ignore` | Glob patterns that should be excluded from analysis |
 | `baseline` | Baseline file path. Defaults to `.fivemcheck-baseline.json` |
+| `luacheck` | Optional luacheck integration settings |
 | `rules` | Per-rule severity overrides |
+
+`luacheck` settings:
+
+| Field | Description |
+| --- | --- |
+| `enabled` | Enables luacheck integration |
+| `binary` | Optional luacheck binary path. Defaults to `luacheck` |
+| `args` | Optional extra arguments passed before the generated luacheck arguments |
+| `std` | Optional luacheck standard. Defaults to `max` |
+| `extraGlobals` | Extra globals that should be allowed in addition to FiveM natives/runtime globals |
+| `ignore` | Optional luacheck warning filters passed through as `--ignore` |
+| `only` | Optional luacheck warning filters passed through as `--only` |
+
+When luacheck is enabled, the checker keeps using the existing FiveM validator rules, and it auto-allows FiveM runtime globals from the official Lua docs when available, with a bundled cache fallback, plus any native call names it can resolve from the native catalog for that file. This means `PlayerPedId()`-style native calls and common runtime helpers like `CreateThread()` or `Wait()` do not show up as undefined globals just because luacheck is unaware of FiveM.
+
+Project `.luacheckrc` files are still honored. The integration disables only Luacheck's machine-wide fallback config so runs stay reproducible across environments.
 
 ## Ignore and suppressions
 
@@ -220,6 +247,7 @@ Current built-in rules:
 | --- | --- | --- |
 | `manifest-basic-check` | `error` | Ensures the manifest exists and declares basic metadata |
 | `manifest-files-check` | `error` | Checks that manifest file references resolve |
+| `luacheck` | `warn` | Merges luacheck results into the final report when enabled |
 | `native-side-check` | `error` | Detects client-only/server-only native misuse |
 | `native-arg-count` | `warn` | Warns on suspicious curated native argument counts |
 | `no-loop-without-wait` | `error` | Flags infinite loops without `Wait`/`Delay` |
@@ -267,6 +295,8 @@ Summary: 3 active findings across 2 files (high: 1, error: 1, warn: 1, info: 0, 
 ## Notes on native metadata
 
 The checker supports optional refresh from `https://runtime.fivem.net/doc/natives.json`, but that payload is not currently sufficient for reliable client/server-side detection on its own. The MVP therefore ships with a curated native cache and merges runtime metadata on top when useful.
+
+For native name allowlisting, `https://runtime.fivem.net/doc/natives.json` is the closest thing to an official machine-readable source and is the best input for this checker. The bundled snapshot stays in [data/natives-cache.json](e:/fivem-validator/data/natives-cache.json), while the broader documentation lives in the FiveM docs and the public `citizenfx/natives` repository.
 
 ## Non-goals
 

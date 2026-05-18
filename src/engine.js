@@ -8,19 +8,48 @@ import { parseGenericFile } from './parsers/genericParser.js';
 import { parseJsFile } from './parsers/jsParser.js';
 import { parseLuaFile } from './parsers/luaParser.js';
 import { parseManifest } from './manifest.js';
+import { runLuacheck } from './luacheck.js';
 import { loadNativeCatalog } from './natives.js';
+import { loadRuntimeGlobalCatalog } from './runtime-globals.js';
 import { buildStats } from './output.js';
 import { matchesAnyGlobPattern } from './utils/fs.js';
 import { RULE_METADATA, rules } from './rules/index.js';
 
 export async function validateResource(resourcePath, options = {}) {
   const config = await loadConfig(resourcePath, options.configPath ?? null, Object.keys(RULE_METADATA));
+  if (options.luacheck) {
+    config.luacheck.enabled = true;
+  }
+
+  if (options.luacheckBinary) {
+    config.luacheck.binary = options.luacheckBinary;
+  }
+
+  if (Array.isArray(options.luacheckArgs)) {
+    config.luacheck.args = options.luacheckArgs;
+  }
+
   const manifest = await parseManifest(resourcePath, config.manifest);
   const discovered = await discoverResourceInputs(resourcePath, manifest, config);
-  const catalog = await loadNativeCatalog({
-    offline: options.offline || config.offline,
-    disableRemoteNatives: options.disableRemoteNatives
-  });
+  const [nativeCatalog, runtimeGlobals] = await Promise.all([
+    loadNativeCatalog({
+      offline: options.offline || config.offline,
+      disableRemoteNatives: options.disableRemoteNatives
+    }),
+    loadRuntimeGlobalCatalog({
+      offline: options.offline || config.offline,
+      disableRemoteRuntimeGlobals: options.disableRemoteNatives
+    })
+  ]);
+
+  const catalog = {
+    natives: nativeCatalog.natives,
+    runtimeGlobals: runtimeGlobals.globals,
+    meta: {
+      ...nativeCatalog.meta,
+      runtimeGlobals: runtimeGlobals.meta
+    }
+  };
 
   const analyses = [];
   for (const target of discovered.analysisTargets) {
@@ -48,6 +77,8 @@ export async function validateResource(resourcePath, options = {}) {
   };
 
   const rawFindings = [];
+  rawFindings.push(...await runLuacheck(context));
+
   for (const rule of rules) {
     rawFindings.push(...rule.apply(context));
   }

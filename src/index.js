@@ -58,7 +58,9 @@ function parseArgs(args) {
     noColor: false,
     writeBaseline: false,
     offline: false,
-    disableRemoteNatives: false
+    disableRemoteNatives: false,
+    luacheck: false,
+    luacheckBinary: null
   };
 
   for (let index = 0; index < args.length; index += 1) {
@@ -110,6 +112,12 @@ function parseArgs(args) {
       case '--offline':
         options.offline = true;
         break;
+      case '--luacheck':
+        options.luacheck = true;
+        break;
+      case '--luacheck-bin':
+        options.luacheckBinary = requireValue(args, ++index, arg);
+        break;
       case '--no-color':
         options.noColor = true;
         break;
@@ -144,9 +152,11 @@ function printHelp() {
     '  --write-baseline [path] Write a baseline file and exit successfully',
     '  --fail-on <level>       Fail on info, warn, error, or high',
     '  --format <text|json>    Select console output format',
-    '  --offline               Skip remote native refresh',
+    '  --offline               Skip remote FiveM metadata refresh',
+    '  --luacheck             Enable luacheck integration for Lua files',
+    '  --luacheck-bin <path>   Override the luacheck binary path',
     '  --no-color              Disable ANSI colors in text output',
-    '  --no-remote-natives     Only use the bundled native catalog',
+    '  --no-remote-natives     Only use the bundled native/runtime metadata',
     '  --help                  Show this help',
     ''
   ].join('\n'));

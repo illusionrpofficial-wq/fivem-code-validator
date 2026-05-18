@@ -7,6 +7,7 @@ import { fileExists } from './utils/fs.js';
 export const DEFAULT_RULES = {
   'manifest-basic-check': 'error',
   'manifest-files-check': 'error',
+  'luacheck': 'warn',
   'native-side-check': 'error',
   'native-arg-count': 'warn',
   'no-loop-without-wait': 'error',
@@ -78,6 +79,7 @@ export async function loadConfig(resourcePath, explicitConfigPath, allowedRuleId
     baselinePath: userConfig.baseline || null,
     rules: configuredRules,
     offline: Boolean(userConfig.offline),
+    luacheck: normalizeLuacheckConfig(userConfig.luacheck),
     userConfig
   };
 }
@@ -112,6 +114,14 @@ function validateUserConfig(userConfig, allowedRuleIds) {
     issues.push('offline must be a boolean');
   }
 
+  if (userConfig.luacheck !== undefined) {
+    if (!userConfig.luacheck || Array.isArray(userConfig.luacheck) || typeof userConfig.luacheck !== 'object') {
+      issues.push('luacheck must be an object');
+    } else {
+      validateLuacheckConfig(userConfig.luacheck, issues);
+    }
+  }
+
   if (userConfig.ignore !== undefined) {
     if (!Array.isArray(userConfig.ignore)) {
       issues.push('ignore must be an array of glob strings');
@@ -142,4 +152,71 @@ function validateUserConfig(userConfig, allowedRuleIds) {
   }
 
   return issues;
+}
+
+function normalizeLuacheckConfig(rawConfig) {
+  const luacheck = rawConfig && typeof rawConfig === 'object' && !Array.isArray(rawConfig)
+    ? rawConfig
+    : {};
+
+  return {
+    enabled: Boolean(luacheck.enabled),
+    binary: typeof luacheck.binary === 'string' && luacheck.binary.trim() !== ''
+      ? luacheck.binary.trim()
+      : 'luacheck',
+    args: normalizeStringList(luacheck.args),
+    std: typeof luacheck.std === 'string' && luacheck.std.trim() !== ''
+      ? luacheck.std.trim()
+      : 'max',
+    extraGlobals: normalizeStringList(luacheck.extraGlobals),
+    ignore: normalizeStringList(luacheck.ignore),
+    only: normalizeStringList(luacheck.only)
+  };
+}
+
+function validateLuacheckConfig(luacheck, issues) {
+  if (luacheck.enabled !== undefined && typeof luacheck.enabled !== 'boolean') {
+    issues.push('luacheck.enabled must be a boolean');
+  }
+
+  for (const [fieldName, value] of Object.entries({
+    binary: luacheck.binary,
+    std: luacheck.std
+  })) {
+    if (value !== undefined && (typeof value !== 'string' || value.trim() === '')) {
+      issues.push(`luacheck.${fieldName} must be a non-empty string`);
+    }
+  }
+
+  for (const [fieldName, value] of Object.entries({
+    args: luacheck.args,
+    extraGlobals: luacheck.extraGlobals,
+    ignore: luacheck.ignore,
+    only: luacheck.only
+  })) {
+    if (value === undefined) {
+      continue;
+    }
+
+    if (!Array.isArray(value)) {
+      issues.push(`luacheck.${fieldName} must be an array of strings`);
+      continue;
+    }
+
+    value.forEach((entry, index) => {
+      if (typeof entry !== 'string' || entry.trim() === '') {
+        issues.push(`luacheck.${fieldName}[${index}] must be a non-empty string`);
+      }
+    });
+  }
+}
+
+function normalizeStringList(value) {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return [...new Set(value
+    .map((entry) => String(entry).trim())
+    .filter(Boolean))];
 }

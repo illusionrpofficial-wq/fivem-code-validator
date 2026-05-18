@@ -8,6 +8,7 @@ import * as manifestFilesCheck from './manifest-files-check.js';
 import * as manifestMissingDependency from './manifest-missing-dependency.js';
 import * as missingJobCheck from './missing-job-check.js';
 import * as missingSourceValidation from './missing-source-validation.js';
+import * as luacheck from './luacheck.js';
 import * as nativeArgCount from './native-arg-count.js';
 import * as nativeSideCheck from './native-side-check.js';
 import * as netEventMissingCooldown from './net-event-missing-cooldown.js';
@@ -22,6 +23,7 @@ import * as sqlInjectionCheck from './sql-injection-check.js';
 export const rules = [
   manifestBasicCheck,
   manifestFilesCheck,
+  luacheck,
   nativeSideCheck,
   nativeArgCount,
   noLoopWithoutWait,

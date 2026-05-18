@@ -1,0 +1,2 @@
+PlayerPedId()
+SomeMissingFunction()

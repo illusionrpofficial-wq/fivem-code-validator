@@ -1,0 +1,83 @@
+{
+  "source": "curated",
+  "functions": {
+    "client": [
+      "AddEventHandler",
+      "Citizen.Await",
+      "Citizen.CreateThread",
+      "Citizen.SetTimeout",
+      "Citizen.Trace",
+      "Citizen.Wait",
+      "CreateThreadNow",
+      "ExecuteCommand",
+      "GetConvar",
+      "GetConvarBool",
+      "GetConvarInt",
+      "GetCurrentResourceName",
+      "IsDuplicityVersion",
+      "LoadResourceFile",
+      "RegisterCommand",
+      "RegisterKeyMapping",
+      "RegisterNetEvent",
+      "RegisterNUICallback",
+      "RemoveEventHandler",
+      "SaveResourceFile",
+      "SendNUIMessage",
+      "TriggerEvent",
+      "TriggerLatentServerEvent",
+      "TriggerServerEvent",
+      "quat",
+      "vec",
+      "vector2",
+      "vector3",
+      "vector4"
+    ],
+    "server": [
+      "AddEventHandler",
+      "Citizen.Await",
+      "Citizen.CreateThread",
+      "Citizen.SetTimeout",
+      "Citizen.Trace",
+      "Citizen.Wait",
+      "CreateThreadNow",
+      "ExecuteCommand",
+      "GetConvar",
+      "GetConvarBool",
+      "GetConvarInt",
+      "GetCurrentResourceName",
+      "GetInvokingResource",
+      "GetPlayerIdentifiers",
+      "GetPlayers",
+      "IsDuplicityVersion",
+      "LoadResourceFile",
+      "PerformHttpRequest",
+      "PerformHttpRequestAwait",
+      "RegisterCommand",
+      "RegisterNetEvent",
+      "RegisterServerEvent",
+      "RemoveEventHandler",
+      "SaveResourceFile",
+      "TriggerClientEvent",
+      "TriggerEvent",
+      "TriggerLatentClientEvent"
+    ],
+    "undocumented": {
+      "all": [
+        "Entity",
+        "Player",
+        "exports",
+        "json",
+        "promise"
+      ],
+      "client": [
+        "LocalPlayer"
+      ],
+      "server": [
+        "source"
+      ],
+      "mutable": [
+        "GlobalState"
+      ]
+    }
+  }
+}
