@@ -1,0 +1,5 @@
+{
+  "framework": "esx",
+  "webDir": "web",
+  "eventPrefix": "myresource:"
+}

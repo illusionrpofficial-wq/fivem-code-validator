@@ -1,0 +1,73 @@
+{
+  "source": "curated",
+  "natives": [
+    {
+      "name": "GET_ENTITY_COORDS",
+      "apiset": "client",
+      "minArgs": 1,
+      "maxArgs": 2,
+      "enforceArgCount": true,
+      "description": "Client-side entity coords lookup."
+    },
+    {
+      "name": "PLAYER_PED_ID",
+      "apiset": "client",
+      "minArgs": 0,
+      "maxArgs": 0,
+      "enforceArgCount": true,
+      "description": "Returns the local player ped."
+    },
+    {
+      "name": "DROP_PLAYER",
+      "apiset": "server",
+      "minArgs": 2,
+      "maxArgs": 2,
+      "enforceArgCount": true,
+      "description": "Disconnects a player from the server."
+    },
+    {
+      "name": "SET_VEHICLE_NUMBER_PLATE_TEXT",
+      "apiset": "client",
+      "minArgs": 2,
+      "maxArgs": 2,
+      "enforceArgCount": true,
+      "description": "Sets a vehicle plate text."
+    },
+    {
+      "name": "SET_ENTITY_COORDS",
+      "apiset": "client",
+      "minArgs": 4,
+      "maxArgs": 8,
+      "enforceArgCount": true,
+      "description": "Moves an entity on the client."
+    },
+    {
+      "name": "WAIT",
+      "apiset": "all",
+      "minArgs": 1,
+      "maxArgs": 1,
+      "enforceArgCount": false,
+      "description": "Runtime wait helper."
+    },
+    {
+      "name": "TRIGGER_SERVER_EVENT",
+      "apiset": "client",
+      "description": "Client to server event trigger."
+    },
+    {
+      "name": "TRIGGER_CLIENT_EVENT",
+      "apiset": "server",
+      "description": "Server to client event trigger."
+    },
+    {
+      "name": "REGISTER_NET_EVENT",
+      "apiset": "all",
+      "description": "Registers a network event."
+    },
+    {
+      "name": "ADD_EVENT_HANDLER",
+      "apiset": "all",
+      "description": "Adds an event handler."
+    }
+  ]
+}

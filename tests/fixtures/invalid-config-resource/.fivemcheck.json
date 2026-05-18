@@ -1,0 +1,6 @@
+{
+  "framework": "esxx",
+  "rules": {
+    "native-side-check": "fatal"
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "eventPrefix": "good:",
+  "ignore": [
+    "legacy/**"
+  ]
+}

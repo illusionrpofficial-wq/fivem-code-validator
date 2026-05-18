@@ -1,0 +1,30 @@
+{
+  "name": "@sajat-org/fivem-checker",
+  "version": "0.1.0",
+  "description": "Validator and statistics generator for FiveM resources.",
+  "type": "module",
+  "bin": {
+    "fivem-check": "./bin/fivem-check.js",
+    "fivem-checker": "./bin/fivem-check.js"
+  },
+  "scripts": {
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "files": [
+    "action.yml",
+    "bin",
+    "src",
+    "data",
+    "README.md"
+  ],
+  "keywords": [
+    "fivem",
+    "validator",
+    "github-action",
+    "sarif"
+  ],
+  "license": "MIT"
+}

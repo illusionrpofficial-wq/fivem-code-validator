@@ -1,0 +1,60 @@
+name: FiveM Resource Checker
+description: Validate FiveM resources and emit CI-friendly findings.
+inputs:
+  path:
+    description: Path to the FiveM resource root.
+    required: false
+    default: .
+  config:
+    description: Optional path to a .fivemcheck.json file.
+    required: false
+  sarif:
+    description: Optional output path for SARIF findings.
+    required: false
+  stats-file:
+    description: Optional output path for JSON statistics.
+    required: false
+  baseline:
+    description: Optional path to a baseline file.
+    required: false
+  fail-on:
+    description: Severity threshold that should fail the check.
+    required: false
+    default: error
+  format:
+    description: Console output format.
+    required: false
+    default: text
+  no-color:
+    description: Disable ANSI colors in text output.
+    required: false
+    default: "false"
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 22
+    - shell: bash
+      run: |
+        set -euo pipefail
+        ARGS=("${{ github.action_path }}/bin/fivem-check.js" "${{ inputs.path }}" "--format" "${{ inputs.format }}")
+        if [ -n "${{ inputs.config }}" ]; then
+          ARGS+=("--config" "${{ inputs.config }}")
+        fi
+        if [ -n "${{ inputs.sarif }}" ]; then
+          ARGS+=("--sarif" "${{ inputs.sarif }}")
+        fi
+        if [ -n "${{ inputs.stats-file }}" ]; then
+          ARGS+=("--stats-file" "${{ inputs.stats-file }}")
+        fi
+        if [ -n "${{ inputs.baseline }}" ]; then
+          ARGS+=("--baseline" "${{ inputs.baseline }}")
+        fi
+        if [ -n "${{ inputs.fail-on }}" ]; then
+          ARGS+=("--fail-on" "${{ inputs.fail-on }}")
+        fi
+        if [ "${{ inputs.no-color }}" = "true" ]; then
+          ARGS+=("--no-color")
+        fi
+        node "${ARGS[@]}"
